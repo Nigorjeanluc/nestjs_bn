@@ -10,13 +10,23 @@ import {
   UsePipes,
   ValidationPipe,
   ParseIntPipe,
-  ParseBoolPipe
+  ParseBoolPipe,
+  HttpException,
+  HttpStatus
 } from '@nestjs/common';
 import { Request, Response } from 'express'
 import { CreateUserDto } from '../../dtos/CreateUser.dto'
+import { UsersService } from '../../services/users/users.service'
 
 @Controller('users')
 export class UsersController {
+
+  constructor(private userService: UsersService) {}
+
+  @Get('services')
+  getNewUsers() {
+    return this.userService.fetchUsers()
+  }
 
   @Get()
   getUsers() {
@@ -75,7 +85,7 @@ export class UsersController {
   @UsePipes(new ValidationPipe())
   createUser(@Body() userData: CreateUserDto) {
     console.log(userData);
-    return userData
+    return this.userService.createUser(userData)
   }
 
   // @Get(':id')
@@ -88,5 +98,13 @@ export class UsersController {
   getUserById(@Param('id', ParseIntPipe) id: number, @Param('postId', ParseIntPipe) postId: number) {
     console.log(id, postId);
     return { id, postId }
+  }
+
+  @Get(':id')
+  getUserById2(@Param('id', ParseIntPipe) id: number) {
+    const user = this.userService.fetchUserById(id)
+    if (!user)
+      throw new HttpException('User not found', HttpStatus.BAD_REQUEST)
+    return user
   }
 }
