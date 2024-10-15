@@ -12,14 +12,17 @@ import {
   ParseIntPipe,
   ParseBoolPipe,
   HttpException,
-  HttpStatus
+  HttpStatus,
+  UseGuards
 } from '@nestjs/common';
 import { Request, Response } from 'express'
 import { CreateUserDto } from '../../dtos/CreateUser.dto'
 import { UsersService } from '../../services/users/users.service'
 import { ValidateCreateUserPipe } from '../../pipes/validate-create-user/validate-create-user.pipe'
+import { AuthGuard } from '../../guards/auth/auth.guard'
 
 @Controller('users')
+// @UseGuards(AuthGuard)
 export class UsersController {
 
   constructor(private userService: UsersService) {}
@@ -30,6 +33,7 @@ export class UsersController {
   }
 
   @Get()
+  @UseGuards(AuthGuard)
   getUsers() {
     return [{
       username: 'nigorjeanluc',
